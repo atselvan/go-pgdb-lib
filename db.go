@@ -9,35 +9,35 @@ import (
 
 // DBConn database connection details
 type DbConn struct {
-	hostname string
-	port     string
-	name     string
-	username string
-	password string
+	Hostname string
+	Port     string
+	Name     string
+	Username string
+	Password string
 }
 
 // getConn gets the database connection details from environment variables
 // If the documented environment variables are not set the method return default values
 func (dbConn *DbConn) GetConn() DbConn {
 	// set db hostname
-	if dbConn.hostname = os.Getenv("DB_HOSTNAME"); dbConn.hostname == "" {
-		dbConn.hostname = "192.168.2.75"
+	if dbConn.Hostname = os.Getenv("DB_HOSTNAME"); dbConn.Hostname == "" {
+		dbConn.Hostname = "192.168.2.75"
 	}
 	// set db port
-	if dbConn.port = os.Getenv("DB_PORT"); dbConn.port == "" {
-		dbConn.port = "5432"
+	if dbConn.Port = os.Getenv("DB_PORT"); dbConn.Port == "" {
+		dbConn.Port = "5432"
 	}
 	// set db name
-	if dbConn.name = os.Getenv("DB_NAME"); dbConn.name == "" {
-		dbConn.name = "assets"
+	if dbConn.Name = os.Getenv("DB_NAME"); dbConn.Name == "" {
+		dbConn.Name = "assets"
 	}
 	// set db username
-	if dbConn.username = os.Getenv("DB_USERNAME"); dbConn.username == "" {
-		dbConn.username = "postgres"
+	if dbConn.Username = os.Getenv("DB_USERNAME"); dbConn.Username == "" {
+		dbConn.Username = "postgres"
 	}
 	// set db password
-	if dbConn.password = os.Getenv("DB_PASSWORD"); dbConn.password == "" {
-		dbConn.password = "postgres"
+	if dbConn.Password = os.Getenv("DB_PASSWORD"); dbConn.Password == "" {
+		dbConn.Password = "postgres"
 	}
 	return *dbConn
 }
@@ -45,7 +45,7 @@ func (dbConn *DbConn) GetConn() DbConn {
 // GetDBConnString gets the database connection details and returns the database connection string
 func (dbConn *DbConn) GetConnString() string {
 	*dbConn = dbConn.GetConn()
-	return fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable", dbConn.hostname, dbConn.port, dbConn.name, dbConn.username, dbConn.password)
+	return fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable", dbConn.Hostname, dbConn.Port, dbConn.Name, dbConn.Username, dbConn.Password)
 }
 
 // Connect establishes a connection with the database and validates the connection

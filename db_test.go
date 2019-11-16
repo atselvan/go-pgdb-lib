@@ -1,7 +1,6 @@
 package pgdb
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -18,24 +17,24 @@ func TestDbConn_GetConn_Default(t *testing.T) {
 	defaultPassword := "postgres"
 
 	// check default hostname
-	if dbConn.hostname != defaultHostname {
-		t.Errorf("Database hostname was incorrect, got: %s, want: %s", dbConn.hostname, defaultHostname)
+	if dbConn.Hostname != defaultHostname {
+		t.Errorf("Database hostname was incorrect, got: %s, want: %s", dbConn.Hostname, defaultHostname)
 	}
 	// check default port
-	if dbConn.port != defaultPort {
-		t.Errorf("Database port was incorrect, got: %s, want: %s", dbConn.port, defaultPort)
+	if dbConn.Port != defaultPort {
+		t.Errorf("Database port was incorrect, got: %s, want: %s", dbConn.Port, defaultPort)
 	}
 	// check default name
-	if dbConn.name != defaultName {
-		t.Errorf("Database name was incorrect, got: %s, want: %s", dbConn.name, defaultName)
+	if dbConn.Name != defaultName {
+		t.Errorf("Database name was incorrect, got: %s, want: %s", dbConn.Name, defaultName)
 	}
 	// check default username
-	if dbConn.username != defaultUsername {
-		t.Errorf("Database username was incorrect, got: %s, want: %s", dbConn.username, defaultUsername)
+	if dbConn.Username != defaultUsername {
+		t.Errorf("Database username was incorrect, got: %s, want: %s", dbConn.Username, defaultUsername)
 	}
 	// check default password
-	if dbConn.password != defaultPassword {
-		t.Errorf("Database password was incorrect, got: %s, want: %s", dbConn.password, defaultPassword)
+	if dbConn.Password != defaultPassword {
+		t.Errorf("Database password was incorrect, got: %s, want: %s", dbConn.Password, defaultPassword)
 	}
 }
 
@@ -58,31 +57,29 @@ func TestDbConn_GetConn_Env(t *testing.T) {
 	dbConn = dbConn.GetConn()
 
 	// check env hostname
-	if dbConn.hostname != envHostname {
-		t.Errorf("Database hostname was incorrect, got: %s, want: %s", dbConn.hostname, envHostname)
+	if dbConn.Hostname != envHostname {
+		t.Errorf("Database hostname was incorrect, got: %s, want: %s", dbConn.Hostname, envHostname)
 	}
 	// check env port
-	if dbConn.port != envPort {
-		t.Errorf("Database port was incorrect, got: %s, want: %s", dbConn.port, envPort)
+	if dbConn.Port != envPort {
+		t.Errorf("Database port was incorrect, got: %s, want: %s", dbConn.Port, envPort)
 	}
 	// check env name
-	if dbConn.name != envName {
-		t.Errorf("Database name was incorrect, got: %s, want: %s", dbConn.name, envName)
+	if dbConn.Name != envName {
+		t.Errorf("Database name was incorrect, got: %s, want: %s", dbConn.Name, envName)
 	}
 	// check env username
-	if dbConn.username != envUsername {
-		t.Errorf("Database username was incorrect, got: %s, want: %s", dbConn.username, envUsername)
+	if dbConn.Username != envUsername {
+		t.Errorf("Database username was incorrect, got: %s, want: %s", dbConn.Username, envUsername)
 	}
 	// check env password
-	if dbConn.password != envPassword {
-		t.Errorf("Database password was incorrect, got: %s, want: %s", dbConn.password, envPassword)
+	if dbConn.Password != envPassword {
+		t.Errorf("Database password was incorrect, got: %s, want: %s", dbConn.Password, envPassword)
 	}
 	_ = os.Setenv("DB_HOSTNAME", "example.com")
 
-	fmt.Println(os.Getenv("DB_HOSTNAME"))
-
 	dbConn = dbConn.GetConn()
-	if dbConn.hostname != "example.com" {
-		t.Errorf("Hostname was incorrect, got: %s, want: %s", dbConn.hostname, "example.com")
+	if dbConn.Hostname != "example.com" {
+		t.Errorf("Hostname was incorrect, got: %s, want: %s", dbConn.Hostname, "example.com")
 	}
 }

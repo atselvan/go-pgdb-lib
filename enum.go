@@ -6,18 +6,18 @@ import (
 )
 
 type Enum struct {
-	name   string
-	values []string
+	Name   string
+	Values []string
 }
 
 // Exists checks if a enum type already exists or not in the database
 // The method returns a boolean value and an error depending on the result
 func (e *Enum) Exists() (bool, error) {
 	var dbConn DbConn
-	if e.name == "" {
+	if e.Name == "" {
 		return false, errors.New("enum name cannot be empty")
 	}
-	err := dbConn.Exec(fmt.Sprintf("select unnest (enum_range(NULL::%s));", e.name))
+	err := dbConn.Exec(fmt.Sprintf("select unnest (enum_range(NULL::%s));", e.Name))
 	if err == nil {
 		return true, err
 	} else {
@@ -33,7 +33,7 @@ func (e *Enum) Get() error {
 	if err != nil {
 		return err
 	}
-	rows, err := db.Query(fmt.Sprintf("select unnest (enum_range(NULL::%s));", e.name))
+	rows, err := db.Query(fmt.Sprintf("select unnest (enum_range(NULL::%s));", e.Name))
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (e *Enum) Get() error {
 		if err != nil {
 			return err
 		}
-		e.values = append(e.values, value)
+		e.Values = append(e.Values, value)
 	}
 	return err
 }
@@ -52,28 +52,28 @@ func (e *Enum) Get() error {
 // The method returns an error if something goes wrong
 func (e *Enum) Create() error {
 	var dbConn DbConn
-	if e.name == "" {
+	if e.Name == "" {
 		return errors.New("enum name cannot be empty")
 	}
-	return dbConn.Exec(fmt.Sprintf("create type %s as enum ();", e.name))
+	return dbConn.Exec(fmt.Sprintf("create type %s as enum ();", e.Name))
 }
 
 // Add updates the enum type in the database
 // The method returns an error if something goes wrong
 func (e *Enum) Update() error {
 	var dbConn DbConn
-	if e.name == "" || len(e.values) < 1 {
+	if e.Name == "" || len(e.Values) < 1 {
 		return errors.New("enum name or value cannot be empty")
 	}
-	return dbConn.Exec(fmt.Sprintf("alter type %s add value '%s';", e.name, e.values[0]))
+	return dbConn.Exec(fmt.Sprintf("alter type %s add value '%s';", e.Name, e.Values[0]))
 }
 
 // Delete removes the enum type from the database
 // The method returns an error if something goes wrong
 func (e *Enum) Delete() error {
 	var dbConn DbConn
-	if e.name == "" {
+	if e.Name == "" {
 		return errors.New("enum name cannot be empty")
 	}
-	return dbConn.Exec(fmt.Sprintf("drop type %s;", e.name))
+	return dbConn.Exec(fmt.Sprintf("drop type %s;", e.Name))
 }
