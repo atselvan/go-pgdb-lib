@@ -13,7 +13,7 @@ type Table struct {
 type TableColumn struct {
 	Name        string
 	DataType    string
-	constraints []string
+	Constraints []string
 }
 
 // GetQuery creates and returns a SQL table query which would be used to create a table in the database
@@ -22,9 +22,9 @@ func (t *Table) GetQuery() string {
 	query = fmt.Sprintf("CREATE TABLE %s (\n", t.Name)
 	for i, c := range t.Columns {
 		query += "\t" + c.Name + "\t" + c.DataType + "\t"
-		for i, cs := range c.constraints {
+		for i, cs := range c.Constraints {
 			query += cs
-			if i < len(c.constraints)-1 {
+			if i < len(c.Constraints)-1 {
 				query += "\t"
 			}
 		}
