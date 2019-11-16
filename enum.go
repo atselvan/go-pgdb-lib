@@ -1,21 +1,38 @@
 package pgdb
 
 import (
-	"errors"
 	"fmt"
+	"github.com/atselvan/go-utils"
+	"strings"
 )
 
+// Enum represents a Enum type in the database
 type Enum struct {
 	Name   string
 	Values []string
+}
+
+// GetEnumName return the name of a enum type
+func (e *Enum) GetEnumName() string {
+	return strings.TrimSpace(e.Name)
+}
+
+// IsValidEnumName checks if enum name is not empty
+// The method return an error if enum name is a empty value
+func (e *Enum) isValidEnumName() error {
+	if e.GetEnumName() == "" {
+		return utils.Error{ErrStr: enumNameEmptyErr, ErrMsg: enumNameEmptyErrStr}.NewError()
+	} else {
+		return nil
+	}
 }
 
 // Exists checks if a enum type already exists or not in the database
 // The method returns a boolean value and an error depending on the result
 func (e *Enum) Exists() (bool, error) {
 	var dbConn DbConn
-	if e.Name == "" {
-		return false, errors.New("enum name cannot be empty")
+	if err := e.isValidEnumName(); err != nil {
+		return false, err
 	}
 	err := dbConn.Exec(fmt.Sprintf("select unnest (enum_range(NULL::%s));", e.Name))
 	if err == nil {
@@ -24,6 +41,7 @@ func (e *Enum) Exists() (bool, error) {
 		return false, err
 	}
 }
+
 
 // Get returns a list of enum type values
 // The method returns the values of a enum or an error
@@ -35,13 +53,13 @@ func (e *Enum) Get() error {
 	}
 	rows, err := db.Query(fmt.Sprintf("select unnest (enum_range(NULL::%s));", e.Name))
 	if err != nil {
-		return err
+		return dbConn.QueryExecError(err)
 	}
 	for rows.Next() {
 		var value string
 		err = rows.Scan(&value)
 		if err != nil {
-			return err
+			return dbConn.RowScanError(err)
 		}
 		e.Values = append(e.Values, value)
 	}
@@ -52,8 +70,8 @@ func (e *Enum) Get() error {
 // The method returns an error if something goes wrong
 func (e *Enum) Create() error {
 	var dbConn DbConn
-	if e.Name == "" {
-		return errors.New("enum name cannot be empty")
+	if err := e.isValidEnumName(); err != nil {
+		return err
 	}
 	return dbConn.Exec(fmt.Sprintf("create type %s as enum ();", e.Name))
 }
@@ -62,8 +80,8 @@ func (e *Enum) Create() error {
 // The method returns an error if something goes wrong
 func (e *Enum) Update() error {
 	var dbConn DbConn
-	if e.Name == "" || len(e.Values) < 1 {
-		return errors.New("enum name or value cannot be empty")
+	if err := e.isValidEnumName(); err != nil {
+		return err
 	}
 	return dbConn.Exec(fmt.Sprintf("alter type %s add value '%s';", e.Name, e.Values[0]))
 }
@@ -72,8 +90,8 @@ func (e *Enum) Update() error {
 // The method returns an error if something goes wrong
 func (e *Enum) Delete() error {
 	var dbConn DbConn
-	if e.Name == "" {
-		return errors.New("enum name cannot be empty")
+	if err := e.isValidEnumName(); err != nil {
+		return err
 	}
 	return dbConn.Exec(fmt.Sprintf("drop type %s;", e.Name))
 }

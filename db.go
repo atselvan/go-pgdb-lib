@@ -3,6 +3,7 @@ package pgdb
 import (
 	"database/sql"
 	"fmt"
+	"github.com/atselvan/go-utils"
 	_ "github.com/lib/pq"
 	"os"
 )
@@ -53,11 +54,11 @@ func (dbConn *DbConn) GetConnString() string {
 func (dbConn *DbConn) Connect() (*sql.DB, error) {
 	db, err := sql.Open("postgres", dbConn.GetConnString())
 	if err != nil {
-		fmt.Println(err)
+		return nil, dbConn.ConnectionError(err)
 	}
 	err = db.Ping()
 	if err != nil {
-		fmt.Println(err)
+		return nil, utils.Error{ErrStr: dbPingErr, ErrMsg: fmt.Sprintf(dbPingErrStr, err)}.NewError()
 	}
 	return db, nil
 }
@@ -73,15 +74,34 @@ func (dbConn *DbConn) Close(db *sql.DB) error {
 func (dbConn *DbConn) Exec(query string) error {
 	db, err := dbConn.Connect()
 	if err != nil {
-		return err
+		return dbConn.ConnectionError(err)
 	}
 	_, err = db.Exec(query)
 	if err != nil {
-		return err
+		return dbConn.QueryExecError(err)
 	}
-	err = dbConn.Close(db)
-	if err != nil {
-		return err
+	if err = dbConn.Close(db); err != nil {
+		return dbConn.ClosureError(err)
 	}
 	return nil
+}
+
+// ConnectionError returns a formatted database connection error
+func (dbConn *DbConn) ConnectionError(err error) error {
+	return utils.Error{ErrStr: dbConnectionErr, ErrMsg: fmt.Sprintf(dbConnectionErrStr, err)}.NewError()
+}
+
+// CloseError returns a formatted database disconnection error
+func (dbConn *DbConn) ClosureError(err error) error {
+	return utils.Error{ErrStr: dbCloseErr, ErrMsg: fmt.Sprintf(dbCloseErrStr, err)}.NewError()
+}
+
+// QueryExecError returns a formatted database query execution error
+func (dbConn *DbConn) QueryExecError(err error) error {
+	return utils.Error{ErrStr: dbQueryExecErr, ErrMsg: fmt.Sprintf(dbQueryExecErrStr, err)}.NewError()
+}
+
+// RowScanError returns a formatted database error while scanning rows
+func (dbConn *DbConn) RowScanError(err error) error {
+	return utils.Error{ErrStr: dbRowScanErr, ErrMsg: fmt.Sprintf(dbRowScanErrStr, err)}.NewError()
 }
