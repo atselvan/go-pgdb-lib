@@ -19,7 +19,7 @@ type TableColumn struct {
 
 // GetTableName returns the name of the table
 func (t *Table) getTableName() string {
-	return strings.TrimSpace(t.getTableName())
+	return strings.TrimSpace(t.Name)
 }
 
 // isValidTableName checks if table name is not empty
@@ -52,7 +52,6 @@ func (t *Table) isValidColumnInfo() error {
 	}
 	return nil
 }
-
 
 // ValidateTableDefinition validates the table definition before creation of the table in the database
 // The method returns an error if something goes wrong

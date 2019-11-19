@@ -12,15 +12,11 @@ type Enum struct {
 	Values []string
 }
 
-// GetEnumName return the name of a enum type
-func (e *Enum) GetEnumName() string {
-	return strings.TrimSpace(e.Name)
-}
-
 // IsValidEnumName checks if enum name is not empty
 // The method return an error if enum name is a empty value
-func (e *Enum) isValidEnumName() error {
-	if e.GetEnumName() == "" {
+func (e *Enum) IsValidEnumName() error {
+	e.Name = strings.TrimSpace(e.Name)
+	if e.Name == "" {
 		return utils.Error{ErrStr: enumNameEmptyErr, ErrMsg: enumNameEmptyErrStr}.NewError()
 	} else {
 		return nil
@@ -31,7 +27,7 @@ func (e *Enum) isValidEnumName() error {
 // The method returns a boolean value and an error depending on the result
 func (e *Enum) Exists() (bool, error) {
 	var dbConn DbConn
-	if err := e.isValidEnumName(); err != nil {
+	if err := e.IsValidEnumName(); err != nil {
 		return false, err
 	}
 	err := dbConn.Exec(fmt.Sprintf("select unnest (enum_range(NULL::%s));", e.Name))
@@ -42,11 +38,13 @@ func (e *Enum) Exists() (bool, error) {
 	}
 }
 
-
 // Get returns a list of enum type values
 // The method returns the values of a enum or an error
 func (e *Enum) Get() error {
 	var dbConn DbConn
+	if err := e.IsValidEnumName(); err != nil {
+		return err
+	}
 	db, err := dbConn.Connect()
 	if err != nil {
 		return err
@@ -70,7 +68,7 @@ func (e *Enum) Get() error {
 // The method returns an error if something goes wrong
 func (e *Enum) Create() error {
 	var dbConn DbConn
-	if err := e.isValidEnumName(); err != nil {
+	if err := e.IsValidEnumName(); err != nil {
 		return err
 	}
 	return dbConn.Exec(fmt.Sprintf("create type %s as enum ();", e.Name))
@@ -80,7 +78,7 @@ func (e *Enum) Create() error {
 // The method returns an error if something goes wrong
 func (e *Enum) Update() error {
 	var dbConn DbConn
-	if err := e.isValidEnumName(); err != nil {
+	if err := e.IsValidEnumName(); err != nil {
 		return err
 	}
 	return dbConn.Exec(fmt.Sprintf("alter type %s add value '%s';", e.Name, e.Values[0]))
@@ -90,7 +88,7 @@ func (e *Enum) Update() error {
 // The method returns an error if something goes wrong
 func (e *Enum) Delete() error {
 	var dbConn DbConn
-	if err := e.isValidEnumName(); err != nil {
+	if err := e.IsValidEnumName(); err != nil {
 		return err
 	}
 	return dbConn.Exec(fmt.Sprintf("drop type %s;", e.Name))
